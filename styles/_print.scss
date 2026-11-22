@@ -1,0 +1,61 @@
+// Reporte en PDF de la parcela (RF-11): el navegador imprime la página sin menú ni controles.
+
+.solo-print {
+  display: none;
+}
+
+@media print {
+  @page {
+    margin: 14mm;
+  }
+
+  html,
+  body,
+  .app-wrapper {
+    background: #fff !important;
+  }
+
+  .no-print,
+  .app-sidebar,
+  .app-header,
+  .app-footer,
+  .leaflet-control-container,
+  .toaster {
+    display: none !important;
+  }
+
+  .app-wrapper {
+    padding: 0 !important;
+  }
+
+  .app-content {
+    padding: 0;
+  }
+
+  .solo-print {
+    display: block !important;
+  }
+
+  .cab-print {
+    margin-bottom: 0.75rem;
+    padding-bottom: 0.375rem;
+    border-bottom: 1px solid #ddd;
+    color: #555;
+    font-size: 0.75rem;
+  }
+
+  .card,
+  .estado-caja,
+  .dato {
+    break-inside: avoid;
+    box-shadow: none !important;
+  }
+
+  .grid2 {
+    grid-template-columns: 1fr;
+  }
+
+  details:not([open]) {
+    display: none;
+  }
+}

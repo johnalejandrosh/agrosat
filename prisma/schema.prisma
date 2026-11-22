@@ -1,0 +1,323 @@
+// Esquema de AgroSat. La conexión se configura en prisma.config.ts
+// (variables DB_* del .env); las tablas viven en el esquema DB_SHEMA.
+//
+// Módulos:
+//   · Acceso: usuarios, roles, permisos y sesiones.
+//   · Monitoreo: cultivos (umbrales), parcelas, escenas Landsat, observaciones e índices.
+//   · Alertas tempranas y registro de procesamiento.
+
+generator client {
+  provider = "prisma-client"
+  output   = "../generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+// =============================================================== Acceso
+
+model User {
+  id            String    @id @default(cuid())
+  name          String    @db.VarChar(120)
+  email         String    @unique @db.VarChar(254)
+  /// Teléfono de contacto (RF-01). Futuro canal de WhatsApp / SMS.
+  phone         String?   @db.VarChar(30)
+  municipality  String?   @db.VarChar(80)
+  passwordHash  String    @map("password_hash")
+  active        Boolean   @default(true)
+  /// Autorización del titular para el tratamiento de datos personales (Ley 1581 de 2012).
+  dataConsentAt DateTime? @map("data_consent_at")
+  /// Recibir las alertas tempranas por correo electrónico.
+  emailAlerts   Boolean   @default(true) @map("email_alerts")
+  roleId        String    @map("role_id")
+  role          Role      @relation(fields: [roleId], references: [id], onDelete: Restrict)
+  lastLoginAt   DateTime? @map("last_login_at")
+  createdAt     DateTime  @default(now()) @map("created_at")
+  updatedAt     DateTime  @updatedAt @map("updated_at")
+  sessions      Session[]
+  parcels       Parcel[]
+
+  @@index([roleId])
+  @@map("users")
+}
+
+model Role {
+  id          String           @id @default(cuid())
+  name        String           @unique @db.VarChar(60)
+  description String?          @db.VarChar(255)
+  /// Rol del sistema (Administrador): no se puede eliminar y tiene acceso total.
+  isSystem    Boolean          @default(false) @map("is_system")
+  createdAt   DateTime         @default(now()) @map("created_at")
+  updatedAt   DateTime         @updatedAt @map("updated_at")
+  users       User[]
+  permissions RolePermission[]
+
+  @@map("roles")
+}
+
+model Permission {
+  id          String           @id @default(cuid())
+  /// Clave que consulta el código, p. ej. "parcels.create".
+  key         String           @unique @db.VarChar(80)
+  name        String           @db.VarChar(120)
+  description String?          @db.VarChar(255)
+  module      String           @db.VarChar(60)
+  /// Permiso usado por la aplicación: no se puede eliminar ni cambiar su clave.
+  isSystem    Boolean          @default(false) @map("is_system")
+  createdAt   DateTime         @default(now()) @map("created_at")
+  updatedAt   DateTime         @updatedAt @map("updated_at")
+  roles       RolePermission[]
+
+  @@index([module])
+  @@map("permissions")
+}
+
+model RolePermission {
+  roleId       String     @map("role_id")
+  permissionId String     @map("permission_id")
+  role         Role       @relation(fields: [roleId], references: [id], onDelete: Cascade)
+  permission   Permission @relation(fields: [permissionId], references: [id], onDelete: Cascade)
+  createdAt    DateTime   @default(now()) @map("created_at")
+
+  @@id([roleId, permissionId])
+  @@index([permissionId])
+  @@map("role_permissions")
+}
+
+model Session {
+  /// SHA-256 del token que viaja en la cookie; el token en claro nunca se guarda.
+  id        String   @id @db.VarChar(64)
+  userId    String   @map("user_id")
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  expiresAt DateTime @map("expires_at")
+  userAgent String?  @map("user_agent") @db.VarChar(255)
+  createdAt DateTime @default(now()) @map("created_at")
+
+  @@index([userId])
+  @@index([expiresAt])
+  @@map("sessions")
+}
+
+// =============================================================== Monitoreo
+
+/// Tipo de cultivo con su ciclo y los umbrales de alerta (RF-12).
+/// Las alertas solo se evalúan en la etapa de desarrollo del cultivo.
+model Crop {
+  id          String   @id @default(cuid())
+  name        String   @unique @db.VarChar(60)
+  /// Días aproximados de la siembra a la cosecha.
+  cycleDays   Int      @map("cycle_days")
+  /// Por debajo de este NDVI la parcela pasa a "precaución" (amarillo).
+  ndviWarning Float    @map("ndvi_warning")
+  /// Por debajo de este NDVI la parcela pasa a "alerta" (rojo).
+  ndviAlert   Float    @map("ndvi_alert")
+  ndwiWarning Float    @map("ndwi_warning")
+  ndwiAlert   Float    @map("ndwi_alert")
+  active      Boolean  @default(true)
+  createdAt   DateTime @default(now()) @map("created_at")
+  updatedAt   DateTime @updatedAt @map("updated_at")
+  parcels     Parcel[]
+
+  @@map("crops")
+}
+
+enum ProcessingStatus {
+  /// Registrada, a la espera del primer procesamiento.
+  PENDING    @map("pending")
+  /// Descargando imágenes y calculando índices.
+  PROCESSING @map("processing")
+  READY      @map("ready")
+  ERROR      @map("error")
+
+  @@map("processing_status")
+}
+
+/// Parcela (lote) de un productor (RF-02). La geometría se guarda como GeoJSON
+/// en WGS84. Si más adelante se habilita PostGIS, se puede derivar una columna geometry.
+model Parcel {
+  id              String           @id @default(cuid())
+  name            String           @db.VarChar(120)
+  ownerId         String           @map("owner_id")
+  owner           User             @relation(fields: [ownerId], references: [id], onDelete: Cascade)
+  cropId          String           @map("crop_id")
+  crop            Crop             @relation(fields: [cropId], references: [id], onDelete: Restrict)
+  municipality    String           @db.VarChar(80)
+  vereda          String?          @db.VarChar(120)
+  sownAt          DateTime         @map("sown_at") @db.Date
+  /// Anillo exterior cerrado del polígono: [[lon, lat], …] (orden GeoJSON).
+  boundary        Json
+  areaHa          Float            @map("area_ha")
+  centroidLat     Float            @map("centroid_lat")
+  centroidLon     Float            @map("centroid_lon")
+  status          ProcessingStatus @default(PENDING)
+  statusMessage   String?          @map("status_message") @db.VarChar(500)
+  /// Inicio del último procesamiento (evita dos procesos simultáneos sobre la misma parcela).
+  processingSince DateTime?        @map("processing_since")
+  processedAt     DateTime?        @map("processed_at")
+  createdAt       DateTime         @default(now()) @map("created_at")
+  updatedAt       DateTime         @updatedAt @map("updated_at")
+  observations    Observation[]
+  alerts          Alert[]
+  runs            ProcessingRun[]
+
+  @@index([ownerId])
+  @@index([cropId])
+  @@index([municipality])
+  @@map("parcels")
+}
+
+/// Escena Landsat 8/9 Colección 2 Nivel 2 (reflectancia superficial), tal como la publica el catálogo STAC.
+model Scene {
+  /// Id del ítem STAC, p. ej. "LC09_L2SP_008057_20261110_02_T1".
+  id           String        @id @db.VarChar(80)
+  /// "landsat-8" | "landsat-9".
+  platform     String        @db.VarChar(20)
+  acquiredAt   DateTime      @map("acquired_at")
+  wrsPath      Int           @map("wrs_path")
+  wrsRow       Int           @map("wrs_row")
+  /// Nubosidad de toda la escena (la de cada parcela está en Observation).
+  cloudCover   Float?        @map("cloud_cover")
+  epsg         Int
+  createdAt    DateTime      @default(now()) @map("created_at")
+  observations Observation[]
+
+  @@index([acquiredAt])
+  @@map("scenes")
+}
+
+/// Índices de una parcela en una escena (RF-04, RF-05). Una fila por parcela y fecha.
+model Observation {
+  id           String   @id @default(cuid())
+  parcelId     String   @map("parcel_id")
+  parcel       Parcel   @relation(fields: [parcelId], references: [id], onDelete: Cascade)
+  sceneId      String   @map("scene_id") @db.VarChar(80)
+  scene        Scene    @relation(fields: [sceneId], references: [id], onDelete: Cascade)
+  acquiredAt   DateTime @map("acquired_at")
+  /// Píxeles de 30 m cuyo centro cae dentro de la parcela.
+  pixelCount   Int      @map("pixel_count")
+  /// Píxeles sin nube, sombra, cirro ni nieve según QA_PIXEL.
+  clearCount   Int      @map("clear_count")
+  /// % de píxeles de la parcela descartados por QA_PIXEL.
+  cloudPct     Float    @map("cloud_pct")
+  /// La fecha sirve para el análisis (nubosidad ≤ umbral y al menos un píxel limpio).
+  valid        Boolean
+  /// Promedio de los píxeles limpios. `null` si la fecha no es válida.
+  ndvi         Float?
+  ndwi         Float?
+  /// Píxeles para el mapa: [{ c: [[lat, lon] ×4], v: ndvi|null, w: ndwi|null, n: nube }].
+  pixels       Json?
+  createdAt    DateTime @default(now()) @map("created_at")
+  alerts       Alert[]
+
+  @@unique([parcelId, sceneId])
+  @@index([parcelId, acquiredAt])
+  @@index([sceneId])
+  @@map("observations")
+}
+
+enum AlertLevel {
+  /// Amarillo: el índice bajó del nivel de precaución.
+  WARNING @map("warning")
+  /// Rojo: el índice bajó del nivel de alerta.
+  ALERT   @map("alert")
+
+  @@map("alert_level")
+}
+
+enum SpectralIndex {
+  NDVI @map("ndvi")
+  NDWI @map("ndwi")
+
+  @@map("spectral_index")
+}
+
+enum AlertStatus {
+  ACTIVE @map("active")
+  CLOSED @map("closed")
+
+  @@map("alert_status")
+}
+
+enum DeliveryStatus {
+  /// Enviado por SMTP.
+  SENT    @map("sent")
+  /// SMTP sin configurar: el correo se registró pero no salió del servidor.
+  LOGGED  @map("logged")
+  /// Alerta histórica (detectada al procesar fechas antiguas) o el usuario no quiere correos.
+  SKIPPED @map("skipped")
+  FAILED  @map("failed")
+
+  @@map("delivery_status")
+}
+
+/// Alerta temprana (RF-09, RF-10). Se abre cuando el semáforo empeora y se cierra al volver a verde.
+model Alert {
+  id            String          @id @default(cuid())
+  parcelId      String          @map("parcel_id")
+  parcel        Parcel          @relation(fields: [parcelId], references: [id], onDelete: Cascade)
+  /// Observación (fecha de imagen) que abrió la alerta.
+  observationId String          @map("observation_id")
+  observation   Observation     @relation(fields: [observationId], references: [id], onDelete: Cascade)
+  level         AlertLevel
+  index         SpectralIndex
+  value         Float
+  threshold     Float
+  status        AlertStatus     @default(ACTIVE)
+  /// Fecha de la imagen que abrió la alerta.
+  openedAt      DateTime        @map("opened_at")
+  /// Fecha de la imagen en que el cultivo volvió a la normalidad.
+  closedAt      DateTime?       @map("closed_at")
+  emailStatus   DeliveryStatus? @map("email_status")
+  emailedAt     DateTime?       @map("emailed_at")
+  emailError    String?         @map("email_error") @db.VarChar(500)
+  createdAt     DateTime        @default(now()) @map("created_at")
+  updatedAt     DateTime        @updatedAt @map("updated_at")
+
+  @@unique([parcelId, observationId])
+  @@index([status])
+  @@index([parcelId, openedAt])
+  @@map("alerts")
+}
+
+enum RunTrigger {
+  /// Primer procesamiento al registrar o redibujar una parcela.
+  REGISTRATION @map("registration")
+  /// Solicitado desde la plataforma.
+  MANUAL       @map("manual")
+  /// Tarea programada (cron) que busca imágenes nuevas.
+  SCHEDULED    @map("scheduled")
+
+  @@map("run_trigger")
+}
+
+enum RunStatus {
+  RUNNING @map("running")
+  SUCCESS @map("success")
+  ERROR   @map("error")
+
+  @@map("run_status")
+}
+
+/// Bitácora de procesamiento de imágenes (RF-03): qué se buscó, qué se procesó y cuánto tardó.
+model ProcessingRun {
+  id              String     @id @default(cuid())
+  parcelId        String     @map("parcel_id")
+  parcel          Parcel     @relation(fields: [parcelId], references: [id], onDelete: Cascade)
+  trigger         RunTrigger
+  status          RunStatus  @default(RUNNING)
+  /// Rango de fechas consultado en el catálogo STAC.
+  searchFrom      DateTime   @map("search_from")
+  searchTo        DateTime   @map("search_to")
+  scenesFound     Int        @default(0) @map("scenes_found")
+  scenesProcessed Int        @default(0) @map("scenes_processed")
+  validCount      Int        @default(0) @map("valid_count")
+  alertsOpened    Int        @default(0) @map("alerts_opened")
+  message         String?    @db.VarChar(1000)
+  startedAt       DateTime   @default(now()) @map("started_at")
+  finishedAt      DateTime?  @map("finished_at")
+
+  @@index([parcelId, startedAt])
+  @@index([startedAt])
+  @@map("processing_runs")
+}

@@ -1,0 +1,135 @@
+// Tokens propios de AgroSat que CoreUI no define (gráficas, semáforo, panel de marca…).
+// Estos son los valores del tema base "Campo"; _themes.scss los sobrescribe por tema.
+
+:root,
+[data-coreui-theme="light"] {
+  --app-ink: #1c201b;
+
+  // Color principal y su texto encima (CoreUI ya define --cui-primary).
+  --app-on-primary: #ffffff;
+  --app-focus-border: #2f6b3a;
+  --app-focus-ring: rgba(47, 107, 58, 0.28);
+  // Versión del color principal para superficies oscuras (sidebar oscuro).
+  --app-primary-dark: #7cc488;
+  --app-primary-dark-rgb: 124, 196, 136;
+  --app-on-primary-dark: #0f120e;
+
+  --app-accent: #8bbf3f;
+  --app-wordmark-accent: #2f6b3a;
+
+  // Series de las gráficas: NDVI (verde) y NDWI (azul agua).
+  --app-chart-1: #2f6b3a;
+  --app-chart-2: #2f6690;
+  --app-chart-3: #8bbf3f;
+  --app-chart-4: #b07d00;
+  --app-chart-1-on: #ffffff;
+  --app-chart-2-on: #ffffff;
+  --app-chart-3-on: #1c201b;
+  --app-chart-4-on: #ffffff;
+  --app-chart-target: #1c201b;
+
+  --app-highlight: rgba(139, 191, 63, 0.38);
+  --app-canvas: #f6f6f3;
+  --app-card-bg: #fff;
+
+  // Panel de marca (login/registro) y logo.
+  --app-brand-gradient: linear-gradient(140deg, #4f8f4a 0%, #2f6b3a 50%, #1d4425 100%);
+  --app-aside-fg: #fff;
+  --app-aside-muted: rgba(255, 255, 255, 0.82);
+  --app-aside-dots: rgba(255, 255, 255, 0.14);
+  --app-aside-halo: rgba(139, 191, 63, 0.4);
+  --app-aside-chip-bg: rgba(255, 255, 255, 0.16);
+  --app-aside-chip-fg: #fff;
+  --app-aside-wordmark: #c7e59a;
+  --app-logo-from: #4f8f4a;
+  --app-logo-to: #1d4425;
+  --app-logo-stroke: #fff;
+  --app-logo-dot: #c7e59a;
+  --app-logo-inverted-bg: #fff;
+  --app-logo-inverted-stroke: #2f6b3a;
+  --app-aside-bar: rgba(199, 229, 154, 0.4);
+  --app-aside-bar-strong: #c7e59a;
+
+  // Gráficas: rejilla, ejes y texto atenuado.
+  --viz-grid: #ecece7;
+  --viz-axis: #d0d2ca;
+  --viz-muted: var(--cui-secondary-color);
+  --viz-zone: #f0f0ec;
+
+  // Semáforo (RF-08). Iguales en todos los temas de color: su significado no cambia.
+  --agro-verde: #2e7d32;
+  --agro-verde-bg: #e8f3e8;
+  --agro-amarillo: #e0a100;
+  --agro-amarillo-txt: #8a5d00;
+  --agro-amarillo-bg: #fdf4dc;
+  --agro-rojo: #c62828;
+  --agro-rojo-bg: #fbeaea;
+  --agro-gris: #9aa095;
+}
+
+[data-coreui-theme="dark"] {
+  --app-on-primary: #0f120e;
+  --app-focus-border: #7cc488;
+  --app-focus-ring: rgba(124, 196, 136, 0.3);
+  --app-accent: #b5d97a;
+  --app-wordmark-accent: #7cc488;
+  --app-chart-1: #7cc488;
+  --app-chart-2: #64a0cd;
+  --app-chart-3: #b5d97a;
+  --app-chart-4: #f0be3c;
+  --app-chart-1-on: #0f120e;
+  --app-chart-2-on: #0f120e;
+  --app-chart-target: #f4f5f1;
+  --app-highlight: rgba(181, 217, 122, 0.3);
+  --app-canvas: #121511;
+  --app-card-bg: #191d18;
+
+  --viz-grid: #2a2f28;
+  --viz-axis: #454a42;
+  --viz-zone: rgba(255, 255, 255, 0.04);
+
+  --agro-verde: #66bb6a;
+  --agro-verde-bg: rgba(102, 187, 106, 0.16);
+  --agro-amarillo: #f0be3c;
+  --agro-amarillo-txt: #f3d27a;
+  --agro-amarillo-bg: rgba(240, 190, 60, 0.16);
+  --agro-rojo: #ef5350;
+  --agro-rojo-bg: rgba(239, 83, 80, 0.16);
+  --agro-gris: #8a8f86;
+}
+
+h1,
+h2,
+h3,
+.h1,
+.h2,
+.h3 {
+  letter-spacing: -0.02em;
+}
+
+.font-display {
+  font-family: var(--font-display), var(--font-sans), sans-serif;
+}
+
+.eyebrow {
+  font-size: 0.75rem;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--cui-secondary-color);
+}
+
+// Subrayado tipo marcador con el color del tema.
+.highlight {
+  padding-inline: 0.1em;
+  background: linear-gradient(transparent 60%, var(--app-highlight) 60%);
+  box-decoration-break: clone;
+  -webkit-box-decoration-break: clone;
+}
+
+// Avatar con el color principal del tema.
+.avatar-brand {
+  background: var(--cui-primary);
+  color: var(--app-on-primary);
+  font-weight: 600;
+}

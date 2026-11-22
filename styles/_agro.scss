@@ -1,0 +1,1128 @@
+// Piezas propias de AgroSat: semáforo, tarjetas de parcela, mapas, series, alertas y formularios.
+// Basado en el prototipo (prototipo.html) y adaptado a las variables de CoreUI y al modo oscuro.
+
+// ---------------------------------------------------------------- Rejillas
+.grid2 {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 1rem;
+
+  > .card {
+    min-width: 0;
+    margin-bottom: 0;
+  }
+
+  .card-body {
+    min-width: 0;
+  }
+}
+
+.grid4 {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 0.75rem;
+  margin-bottom: 1rem;
+}
+
+.bloque {
+  margin-bottom: 1rem;
+}
+
+.page-head__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  align-items: center;
+}
+
+.volver {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+  margin-bottom: 0.5rem;
+  font-size: 0.875rem;
+  text-decoration: none;
+}
+
+.empty-state {
+  max-width: 38rem;
+  margin-inline: auto;
+  padding-block: 3rem;
+  text-align: center;
+}
+
+// ---------------------------------------------------------------- Semáforo
+.punto {
+  display: inline-block;
+  flex-shrink: 0;
+  width: 0.625rem;
+  height: 0.625rem;
+  border-radius: 50%;
+  background: var(--agro-gris);
+
+  &.grande {
+    width: 1rem;
+    height: 1rem;
+  }
+
+  &.verde {
+    background: var(--agro-verde);
+  }
+
+  &.amarillo {
+    background: var(--agro-amarillo);
+  }
+
+  &.rojo {
+    background: var(--agro-rojo);
+  }
+}
+
+.chip {
+  display: inline-block;
+  padding: 0.0625rem 0.5625rem;
+  border-radius: 50rem;
+  background: var(--cui-tertiary-bg);
+  color: var(--cui-secondary-color);
+  font-size: 0.75rem;
+  font-weight: 600;
+  white-space: nowrap;
+
+  &.verde {
+    background: var(--agro-verde-bg);
+    color: var(--agro-verde);
+  }
+
+  &.amarillo {
+    background: var(--agro-amarillo-bg);
+    color: var(--agro-amarillo-txt);
+  }
+
+  &.rojo {
+    background: var(--agro-rojo-bg);
+    color: var(--agro-rojo);
+  }
+}
+
+.txt-rojo {
+  color: var(--agro-rojo);
+}
+
+.txt-amarillo {
+  color: var(--agro-amarillo-txt);
+}
+
+.leyenda-semaforo {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem 1.375rem;
+  margin-top: 0.25rem;
+  font-size: 0.8125rem;
+  color: var(--cui-secondary-color);
+
+  span {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4375rem;
+  }
+}
+
+.resumen-semaforo {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 0.75rem;
+  margin-bottom: 1rem;
+}
+
+.resumen {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 0.875rem;
+  margin: 0;
+  padding: 0.875rem 1.125rem;
+
+  b {
+    display: block;
+    font-family: var(--font-display), var(--font-sans), sans-serif;
+    font-size: 1.625rem;
+    line-height: 1.1;
+    color: var(--cui-emphasis-color);
+  }
+
+  span:not(.punto) {
+    font-size: 0.84375rem;
+    color: var(--cui-secondary-color);
+  }
+}
+
+.estado-caja {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.875rem;
+  margin-bottom: 1rem;
+  padding: 1rem 1.125rem;
+  border: 1px solid var(--cui-border-color);
+  border-left: 5px solid var(--agro-gris);
+  border-radius: var(--cui-border-radius-lg);
+  background: var(--app-card-bg);
+
+  &.verde {
+    border-left-color: var(--agro-verde);
+  }
+
+  &.amarillo {
+    border-left-color: var(--agro-amarillo);
+    background: color-mix(in srgb, var(--agro-amarillo-bg) 45%, var(--app-card-bg));
+  }
+
+  &.rojo {
+    border-left-color: var(--agro-rojo);
+    background: color-mix(in srgb, var(--agro-rojo-bg) 45%, var(--app-card-bg));
+  }
+
+  .punto {
+    margin-top: 0.25rem;
+  }
+
+  strong {
+    font-size: 1.03rem;
+    color: var(--cui-emphasis-color);
+  }
+
+  p {
+    margin: 0.25rem 0;
+  }
+}
+
+.dato {
+  padding: 0.875rem 1rem;
+  border: 1px solid var(--cui-border-color);
+  border-radius: var(--cui-border-radius-lg);
+  background: var(--app-card-bg);
+
+  .titulo {
+    display: flex;
+    align-items: center;
+    gap: 0.4375rem;
+    font-size: 0.78125rem;
+    color: var(--cui-secondary-color);
+  }
+
+  .valor {
+    margin: 0.125rem 0;
+    font-family: var(--font-display), var(--font-sans), sans-serif;
+    font-size: 1.375rem;
+    font-weight: 600;
+    font-variant-numeric: tabular-nums;
+    color: var(--cui-emphasis-color);
+  }
+
+  .nota {
+    font-size: 0.78125rem;
+    line-height: 1.4;
+    color: var(--cui-secondary-color);
+  }
+}
+
+.franja {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.5rem 0.875rem;
+  margin-bottom: 1rem;
+  padding: 0.625rem 0.875rem;
+  border: 1px solid var(--cui-border-color);
+  border-radius: var(--cui-border-radius-lg);
+  background: var(--app-card-bg);
+  font-size: 0.875rem;
+  color: var(--cui-secondary-color);
+
+  b {
+    color: var(--cui-emphasis-color);
+  }
+
+  .sep {
+    padding-left: 0.875rem;
+    border-left: 1px solid var(--cui-border-color);
+  }
+}
+
+.aviso {
+  margin: 0.625rem 0 0;
+  padding: 0.5rem 0.75rem;
+  border-radius: var(--cui-border-radius);
+  background: var(--agro-amarillo-bg);
+  color: var(--agro-amarillo-txt);
+  font-size: 0.84375rem;
+}
+
+.error {
+  margin: 0.375rem 0 0;
+  color: var(--agro-rojo);
+  font-size: 0.84375rem;
+}
+
+.ok {
+  color: var(--agro-verde);
+  font-weight: 500;
+}
+
+.vacio {
+  margin: 0.25rem 0;
+  color: var(--cui-secondary-color);
+}
+
+// ---------------------------------------------------------------- Listas
+.lista {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+
+  li + li {
+    border-top: 1px solid var(--cui-border-color);
+  }
+}
+
+.fila {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.6875rem 0.25rem;
+  color: var(--cui-body-color);
+  text-decoration: none;
+
+  &:hover {
+    background: var(--cui-tertiary-bg);
+    text-decoration: none;
+  }
+
+  strong {
+    color: var(--cui-emphasis-color);
+  }
+
+  &__flecha {
+    flex-shrink: 0;
+    color: var(--cui-tertiary-color);
+  }
+}
+
+.crece {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  min-width: 0;
+
+  small {
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+  }
+}
+
+.valores {
+  display: flex;
+  gap: 0.875rem;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+  color: var(--cui-emphasis-color);
+
+  small {
+    display: block;
+    font-size: 0.6875rem;
+    font-weight: 400;
+    letter-spacing: 0.04em;
+    color: var(--cui-tertiary-color);
+  }
+}
+
+// ---------------------------------------------------------------- Tarjetas de parcela
+.tarjetas {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(17.5rem, 1fr));
+  gap: 1rem;
+}
+
+a.parcela {
+  display: block;
+  margin: 0;
+  color: var(--cui-body-color);
+  text-decoration: none;
+  transition: border-color 0.15s, box-shadow 0.15s;
+
+  &:hover {
+    border-color: var(--cui-primary-border-subtle);
+    box-shadow: var(--cui-box-shadow);
+    text-decoration: none;
+  }
+}
+
+.parcela-cab {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+
+  strong {
+    flex: 1;
+    font-size: 1rem;
+    color: var(--cui-emphasis-color);
+  }
+}
+
+.parcela-msg {
+  margin: 0.625rem 0 0.75rem;
+  font-size: 0.875rem;
+}
+
+.parcela-datos {
+  display: flex;
+  align-items: flex-end;
+  gap: 1.125rem;
+  padding-top: 0.75rem;
+  border-top: 1px solid var(--cui-border-color);
+
+  div {
+    display: flex;
+    flex-direction: column;
+    font-size: 0.75rem;
+  }
+
+  b {
+    font-size: 1.125rem;
+    font-variant-numeric: tabular-nums;
+    color: var(--cui-emphasis-color);
+  }
+}
+
+.chispa {
+  margin-left: auto;
+}
+
+// ---------------------------------------------------------------- Pestañas
+.pestanas {
+  display: inline-flex;
+  flex-wrap: wrap;
+  gap: 0.125rem;
+  padding: 0.1875rem;
+  border-radius: var(--cui-border-radius);
+  background: var(--cui-tertiary-bg);
+
+  button {
+    padding: 0.3125rem 0.75rem;
+    border: 0;
+    border-radius: calc(var(--cui-border-radius) - 0.125rem);
+    background: transparent;
+    color: var(--cui-secondary-color);
+    font-size: 0.84375rem;
+    cursor: pointer;
+
+    &:hover {
+      color: var(--cui-emphasis-color);
+    }
+
+    &.activa {
+      background: var(--app-card-bg);
+      color: var(--cui-emphasis-color);
+      font-weight: 600;
+      box-shadow: 0 1px 2px rgba(0, 0, 0, 0.08);
+    }
+  }
+
+  &.chica button {
+    padding: 0.1875rem 0.625rem;
+    font-size: 0.78125rem;
+  }
+}
+
+.fila-control {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.625rem;
+  margin-bottom: 0.625rem;
+  font-size: 0.84375rem;
+  color: var(--cui-secondary-color);
+}
+
+// ---------------------------------------------------------------- Mapas
+.mapa {
+  z-index: 0;
+  width: 100%;
+  border-radius: var(--cui-border-radius);
+  background: var(--cui-tertiary-bg);
+}
+
+.mapa-slot > .mapa--cargando {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  min-height: inherit;
+  color: var(--cui-secondary-color);
+  font-size: 0.875rem;
+}
+
+.mapa-dibujo {
+  cursor: crosshair;
+}
+
+// Leaflet fija Helvetica/Arial; se usa la tipografía de la app (más específico que leaflet.css).
+.mapa.leaflet-container {
+  font-family: var(--font-sans), system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  font-size: 0.8125rem;
+
+  .leaflet-control-zoom a,
+  .leaflet-control-attribution {
+    font-family: var(--font-sans), system-ui, sans-serif;
+  }
+}
+
+[data-coreui-theme="dark"] .leaflet-popup-content-wrapper,
+[data-coreui-theme="dark"] .leaflet-popup-tip {
+  background: var(--app-card-bg);
+  color: var(--cui-body-color);
+}
+
+.etiqueta-mapa {
+  padding: 0.0625rem 0.375rem;
+  border: 0;
+  background: rgba(255, 255, 255, 0.88);
+  box-shadow: none;
+  color: #1c201b;
+  font-size: 0.75rem;
+  font-weight: 600;
+
+  &::before {
+    display: none;
+  }
+}
+
+.leyenda {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.5rem 1.125rem;
+  margin-top: 0.625rem;
+  font-size: 0.78125rem;
+  color: var(--cui-secondary-color);
+
+  .item {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.375rem;
+  }
+}
+
+.rampa {
+  flex: 1;
+  min-width: 13.75rem;
+
+  > span {
+    display: block;
+    height: 0.625rem;
+    border-radius: 0.3125rem;
+  }
+}
+
+.rampa-txt {
+  display: flex;
+  justify-content: space-between;
+  gap: 0.5rem;
+  margin-top: 0.1875rem;
+}
+
+.cuadro {
+  display: inline-block;
+  width: 0.75rem;
+  height: 0.75rem;
+  border-radius: 2px;
+
+  &.nube {
+    background: #c3c7cc;
+  }
+
+  &.borde {
+    border: 2.5px solid var(--agro-verde);
+    background: transparent;
+  }
+}
+
+.mapa-layout {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 20rem;
+  align-items: start;
+  gap: 1rem;
+
+  > .card {
+    margin: 0;
+  }
+}
+
+.panel {
+  h2 {
+    margin: 1rem 0 0.5rem;
+    font-size: 0.875rem;
+  }
+
+  h2:first-child {
+    margin-top: 0;
+  }
+}
+
+.ayuda {
+  margin-top: 0.875rem;
+  color: var(--cui-secondary-color);
+  font-size: 0.84375rem;
+
+  p {
+    margin: 0.5rem 0 0;
+  }
+}
+
+summary {
+  width: max-content;
+  max-width: 100%;
+  margin-top: 0.375rem;
+  color: var(--cui-link-color);
+  cursor: pointer;
+}
+
+// ---------------------------------------------------------------- Series de tiempo
+// Chart.js necesita un contenedor propio que pueda encogerse para redimensionar bien.
+.grafica {
+  position: relative;
+  width: 100%;
+  min-width: 0;
+  height: 16.875rem;
+
+  canvas {
+    max-width: 100%;
+  }
+}
+
+.leyenda-serie {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.375rem 1rem;
+  margin-top: 0.5rem;
+  font-size: 0.78125rem;
+  color: var(--cui-secondary-color);
+
+  span {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.375rem;
+  }
+
+  .zona {
+    display: inline-block;
+    width: 0.875rem;
+    height: 0.625rem;
+    border: 1px solid var(--cui-border-color);
+    background: var(--viz-zone);
+  }
+}
+
+// ---------------------------------------------------------------- Alertas
+.alerta {
+  display: flex;
+  gap: 0.75rem;
+  padding: 0.875rem 0;
+  border-top: 1px solid var(--cui-border-color);
+
+  .punto {
+    margin-top: 0.375rem;
+  }
+
+  p {
+    margin: 0.25rem 0 0.375rem;
+    font-size: 0.90625rem;
+  }
+}
+
+.alertas > .alerta:first-child {
+  padding-top: 0.125rem;
+  border-top: none;
+}
+
+.alerta-cuerpo {
+  flex: 1;
+  min-width: 0;
+
+  details {
+    font-size: 0.84375rem;
+  }
+}
+
+.alerta-cab {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 0.375rem;
+
+  strong {
+    color: var(--cui-emphasis-color);
+  }
+
+  .fecha {
+    margin-left: auto;
+    font-size: 0.8125rem;
+  }
+}
+
+.alerta-pie {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.375rem 0.75rem;
+  font-size: 0.8125rem;
+  color: var(--cui-secondary-color);
+
+  span {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.3125rem;
+  }
+}
+
+.correo {
+  margin: 0.5rem 0 0;
+  padding: 0.75rem;
+  border: 1px solid var(--cui-border-color);
+  border-radius: var(--cui-border-radius);
+  background: var(--cui-tertiary-bg);
+  font: 0.8125rem/1.55 var(--font-mono), ui-monospace, monospace;
+  white-space: pre-wrap;
+}
+
+.canal {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.625rem 0;
+
+  & + .canal {
+    border-top: 1px solid var(--cui-border-color);
+  }
+
+  > div {
+    display: flex;
+    flex: 1;
+    flex-direction: column;
+  }
+
+  .form-check {
+    margin: 0;
+  }
+
+  &.deshabilitado {
+    opacity: 0.6;
+  }
+}
+
+// ---------------------------------------------------------------- Tablas
+.table-agro {
+  --cui-table-bg: transparent;
+
+  th {
+    font-size: 0.75rem;
+    font-weight: 600;
+    letter-spacing: 0.04em;
+    color: var(--cui-secondary-color);
+    white-space: nowrap;
+  }
+
+  th:first-child,
+  td:first-child {
+    padding-left: 1.25rem;
+  }
+
+  .num {
+    text-align: right;
+    font-variant-numeric: tabular-nums;
+    white-space: nowrap;
+  }
+
+  tr.clic {
+    cursor: pointer;
+  }
+
+  .estado {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4375rem;
+    white-space: nowrap;
+  }
+
+  &.umbrales input[type="number"] {
+    width: 5.5rem;
+  }
+}
+
+.vista-previa {
+  margin: 0 0 1rem;
+  padding: 0.625rem 0.875rem;
+  border-radius: var(--cui-border-radius);
+  background: var(--cui-tertiary-bg);
+  font-size: 0.875rem;
+}
+
+.config-list {
+  display: grid;
+  grid-template-columns: max-content 1fr;
+  gap: 0.375rem 1rem;
+  margin: 0;
+  font-size: 0.84375rem;
+
+  dt {
+    font-weight: 600;
+    color: var(--cui-secondary-color);
+  }
+
+  dd {
+    min-width: 0;
+    margin: 0;
+    overflow-wrap: anywhere;
+  }
+}
+
+// ---------------------------------------------------------------- Formulario de parcela
+.formulario-layout {
+  display: grid;
+  grid-template-columns: 21.25rem minmax(0, 1fr);
+  align-items: start;
+  gap: 1rem;
+
+  > .card {
+    margin: 0;
+  }
+}
+
+.campo {
+  margin-bottom: 0.875rem;
+
+  .form-label {
+    margin-bottom: 0.25rem;
+    font-size: 0.84375rem;
+    font-weight: 600;
+  }
+
+  small {
+    display: block;
+    margin-top: 0.25rem;
+    font-size: 0.78125rem;
+  }
+}
+
+.area {
+  margin: 0.625rem 0 0;
+  font-size: 0.875rem;
+}
+
+.procesando {
+  padding: 1rem 1.125rem;
+  border: 1px solid var(--cui-primary-border-subtle);
+  border-radius: var(--cui-border-radius-lg);
+  background: var(--cui-primary-bg-subtle);
+}
+
+.procesos {
+  margin-bottom: 1rem;
+  font-size: 0.875rem;
+}
+
+// ---------------------------------------------------------------- Responsivo (RNF-02)
+@media (max-width: 1199.98px) {
+  .grid2,
+  .mapa-layout,
+  .formulario-layout {
+    grid-template-columns: 1fr;
+  }
+
+  .grid4 {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 575.98px) {
+  .resumen {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.375rem;
+    padding: 0.75rem;
+
+    b {
+      font-size: 1.375rem;
+    }
+  }
+
+  .franja .sep {
+    padding-left: 0;
+    border-left: 0;
+  }
+
+  .fila {
+    flex-wrap: wrap;
+  }
+
+  .valores {
+    width: 100%;
+    gap: 1.125rem;
+    padding-left: 1.375rem;
+  }
+
+  .fila__flecha {
+    display: none;
+  }
+
+  .alerta-cab .fecha {
+    width: 100%;
+    margin-left: 0;
+  }
+
+  .mapa-grande .mapa {
+    height: 23.75rem !important;
+  }
+}
+
+// ---------------------------------------------------------------------------
+// Satélites en órbita (globo Mapbox)
+// ---------------------------------------------------------------------------
+.orbita {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 20rem;
+  gap: 1rem;
+  align-items: start;
+  @media (max-width: 991.98px) {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+.orbita-mapa {
+  position: relative;
+  min-width: 0;
+  border-radius: var(--cui-border-radius-lg);
+  overflow: hidden;
+  border: 1px solid var(--cui-border-color);
+  background: #080a16;
+}
+
+.orbita-canvas,
+.orbita-cargando {
+  height: calc(100vh - 13rem);
+  min-height: 26rem;
+  @media (max-width: 991.98px) {
+    height: 65vh;
+  }
+}
+
+.orbita-cargando {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  border-radius: var(--cui-border-radius-lg);
+  background: #080a16;
+  color: #cbd5e1;
+}
+
+.orbita-reloj {
+  position: absolute;
+  top: 0.75rem;
+  left: 0.75rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.35rem 0.65rem;
+  border-radius: 999px;
+  background: rgb(8 10 22 / 72%);
+  color: #f1f5f9;
+  font-size: 0.8125rem;
+  font-variant-numeric: tabular-nums;
+  pointer-events: none;
+  backdrop-filter: blur(4px);
+}
+
+.orbita-vivo {
+  padding: 0.05rem 0.45rem;
+  border-radius: 999px;
+  background: #475569;
+  font-size: 0.6875rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  &.on {
+    background: #dc2626;
+    animation: orbita-pulso 2s ease-in-out infinite;
+  }
+}
+
+@keyframes orbita-pulso {
+  50% {
+    opacity: 0.6;
+  }
+}
+
+.sat-marker {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 0;
+  border: 0;
+  background: none;
+  color: var(--sat);
+  cursor: pointer;
+  svg {
+    width: 2.1rem;
+    height: 2.1rem;
+    filter: drop-shadow(0 0 6px var(--sat)) drop-shadow(0 1px 1px rgb(0 0 0 / 80%));
+    transition: transform 0.15s;
+  }
+  span {
+    margin-top: -0.15rem;
+    padding: 0 0.35rem;
+    border-radius: 4px;
+    background: rgb(8 10 22 / 75%);
+    color: #fff;
+    font-size: 0.6875rem;
+    font-weight: 600;
+    white-space: nowrap;
+  }
+  &:hover svg,
+  &:focus-visible svg {
+    transform: scale(1.2);
+  }
+}
+
+.orbita-panel {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  min-width: 0;
+  > section {
+    padding: 0.85rem 1rem;
+    border: 1px solid var(--cui-border-color);
+    border-radius: var(--cui-border-radius-lg);
+    background: var(--app-card-bg, var(--cui-body-bg));
+  }
+  h2 {
+    margin: 0 0 0.6rem;
+    font-size: 0.9375rem;
+    font-weight: 600;
+  }
+}
+
+.orbita-opciones {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+  margin-top: 0.75rem;
+  font-size: 0.8125rem;
+  .form-check {
+    margin: 0;
+  }
+}
+
+.orbita-sat {
+  border-left: 4px solid var(--sat) !important;
+  &.activo {
+    box-shadow: 0 0 0 2px color-mix(in srgb, var(--sat) 45%, transparent);
+  }
+  header {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin-bottom: 0.5rem;
+    h2 {
+      margin: 0;
+    }
+  }
+  dl {
+    display: grid;
+    grid-template-columns: auto 1fr;
+    gap: 0.15rem 0.75rem;
+    margin: 0;
+    font-size: 0.8125rem;
+    font-variant-numeric: tabular-nums;
+  }
+  dt {
+    color: var(--cui-secondary-color);
+    font-weight: 400;
+  }
+  dd {
+    margin: 0;
+    text-align: right;
+  }
+}
+
+.orbita-punto {
+  width: 0.7rem;
+  height: 0.7rem;
+  border-radius: 50%;
+  background: var(--sat);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--sat) 25%, transparent);
+}
+
+.orbita-pasadas {
+  margin-top: 0.6rem;
+  padding-top: 0.6rem;
+  border-top: 1px dashed var(--cui-border-color);
+  font-size: 0.8125rem;
+  ol {
+    margin: 0.25rem 0 0;
+    padding-left: 1.1rem;
+  }
+}
+
+.orbita-nota {
+  margin: 0;
+  color: var(--cui-secondary-color);
+  font-size: 0.75rem;
+  line-height: 1.45;
+}
+
+// Registro de parcela: cultivo escrito por el productor y buscador de lugares.
+.cultivo-nuevo {
+  margin: -0.25rem 0 1rem;
+  padding: 0.75rem 0.85rem 0.6rem;
+  border-left: 3px solid var(--cui-primary);
+  border-radius: var(--cui-border-radius);
+  background: var(--cui-tertiary-bg);
+  .campo {
+    margin-bottom: 0.6rem;
+  }
+}
+
+.buscar-lugar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-bottom: 0.5rem;
+  .input-group {
+    flex: 1 1 16rem;
+    width: auto;
+  }
+}
+
+.lugares {
+  margin: 0 0 0.5rem;
+  padding: 0.25rem;
+  list-style: none;
+  border: 1px solid var(--cui-border-color);
+  border-radius: var(--cui-border-radius);
+  background: var(--cui-body-bg);
+  button {
+    display: block;
+    width: 100%;
+    padding: 0.4rem 0.6rem;
+    border: 0;
+    border-radius: var(--cui-border-radius-sm);
+    background: none;
+    color: inherit;
+    font-size: 0.875rem;
+    text-align: left;
+    &:hover,
+    &:focus-visible {
+      background: var(--cui-tertiary-bg);
+    }
+  }
+}

@@ -1,0 +1,171 @@
+// =============================================================================
+// Tema base de AgroSat sobre CoreUI — "Campo": verde cultivo + neutros de tierra.
+// Los temas alternativos (Océano, Esmeralda…) están en _themes.scss.
+//
+// Se compila CoreUI desde sus fuentes Sass y se configuran sus variables con
+// `@use ... with (...)`, tal como indica la guía "Sass" de la documentación.
+// Así cambian de verdad todos los componentes (botones, badges, foco, sidebar…).
+//
+// El semáforo del cultivo usa $success (verde), $warning (amarillo) y $danger (rojo):
+// mantenerlos distinguibles del color de marca.
+// =============================================================================
+
+@use "@coreui/coreui/scss/coreui" with (
+  // --- Paleta ----------------------------------------------------------------
+  $primary: #2f6b3a,            // verde AgroSat
+  $secondary: #6b7066,
+  $success: #2e7d32,            // semáforo: normal
+  $info: #2f6690,
+  $warning: #e0a100,            // semáforo: precaución
+  $danger: #c62828,             // semáforo: alerta
+
+  $primary-text-emphasis: #1d4425,
+  $secondary-text-emphasis: #2c302a,
+  $success-text-emphasis: #1b5e20,
+  $info-text-emphasis: #1d4563,
+  $warning-text-emphasis: #8a5d00,
+  $danger-text-emphasis: #8e1c1c,
+  $primary-bg-subtle: #e9f1e7,
+  $secondary-bg-subtle: #eeefea,
+  $success-bg-subtle: #e8f3e8,
+  $info-bg-subtle: #e4eef5,
+  $warning-bg-subtle: #fdf4dc,
+  $danger-bg-subtle: #fbeaea,
+  $primary-border-subtle: #b9d3b4,
+  $secondary-border-subtle: #d6d8d0,
+  $success-border-subtle: #a5d6a7,
+  $info-border-subtle: #a9c7dd,
+  $warning-border-subtle: #f3d27a,
+  $danger-border-subtle: #ef9a9a,
+
+  // Texto/checks blancos sobre el verde. Los SVG de checkbox/switch necesitan un
+  // color literal; cada tema alternativo los regenera en _themes.scss.
+  $component-active-color: #ffffff,
+  $link-color: #2f6b3a,
+
+  // Valores que dependen del tema activo: se exponen como variables CSS
+  // (definidas en _app-tokens.scss y sobrescritas por tema en _themes.scss).
+  $input-focus-border-color: var(--app-focus-border),
+  $focus-ring-color: var(--app-focus-ring),
+  $form-switch-focus-color: #9dbf98,
+  $nav-pills-link-active-color: var(--app-on-primary),
+  $dropdown-link-active-color: var(--app-on-primary),
+  $pagination-active-color: var(--app-on-primary),
+  $list-group-active-color: var(--app-on-primary),
+
+  // --- Neutros con tinte de campo -------------------------------------------
+  $gray-base: #2c302a,
+  $gray-100: #f4f5f1,
+  $gray-200: #e3e4de,
+  $gray-300: #d0d2ca,
+  $gray-400: #a3a89f,
+  $gray-500: #8a8f86,
+  $gray-600: #5f655b,
+  $gray-700: #454a42,
+  $gray-800: #2c302a,
+  $gray-900: #1c201b,
+  $black: #0f120e,
+
+  $body-tertiary-bg: #f6f6f3,
+  $border-color: #e3e4de,
+  $border-color-translucent: rgba(28, 32, 27, 0.12),
+
+  // --- Modo oscuro: tierra oscura, el verde se aclara -----------------------
+  $primary-dark: #7cc488,
+  $link-color-dark: #9bd5a4,
+  $body-bg-dark: #121511,
+  $body-secondary-bg-dark: #262b24,
+  $body-tertiary-bg-dark: #1d211b,
+  $border-color-dark: #2c322a,
+  $border-color-translucent-dark: rgba(255, 255, 255, 0.08),
+  $primary-bg-subtle-dark: rgba(124, 196, 136, 0.16),
+  $secondary-bg-subtle-dark: rgba(163, 168, 159, 0.16),
+  $success-bg-subtle-dark: rgba(102, 187, 106, 0.18),
+  $info-bg-subtle-dark: rgba(100, 160, 205, 0.2),
+  $warning-bg-subtle-dark: rgba(240, 190, 60, 0.2),
+  $danger-bg-subtle-dark: rgba(239, 83, 80, 0.2),
+  $primary-text-emphasis-dark: #b5e0bb,
+  $secondary-text-emphasis-dark: #d0d2ca,
+  $success-text-emphasis-dark: #a5d6a7,
+  $info-text-emphasis-dark: #a9c7dd,
+  $warning-text-emphasis-dark: #f3d27a,
+  $danger-text-emphasis-dark: #ef9a9a,
+  $primary-border-subtle-dark: #2f5a36,
+  $secondary-border-subtle-dark: #454a42,
+  $success-border-subtle-dark: #2e6b31,
+  $info-border-subtle-dark: #2a5374,
+  $warning-border-subtle-dark: #7a5a0c,
+  $danger-border-subtle-dark: #7f2020,
+
+  // --- Tipografía (fuentes cargadas con next/font en app/layout.tsx) ---------
+  $font-family-sans-serif: (var(--font-sans), system-ui, -apple-system, "Segoe UI", Roboto, sans-serif),
+  $font-family-monospace: (var(--font-mono), ui-monospace, SFMono-Regular, Menlo, monospace),
+  $headings-font-family: (var(--font-display), var(--font-sans), sans-serif),
+  $headings-font-weight: 600,
+  $font-size-base: 0.9375rem,
+  $link-decoration: none,
+  $link-hover-decoration: underline,
+
+  // --- Formas y profundidad --------------------------------------------------
+  $border-radius: 0.625rem,
+  $border-radius-sm: 0.5rem,
+  $border-radius-lg: 1rem,
+  $border-radius-xl: 1.5rem,
+  $border-radius-xxl: 2rem,
+  $box-shadow-sm: (0 1px 2px rgba(28, 25, 23, 0.05), 0 1px 3px rgba(28, 25, 23, 0.07)),
+  $box-shadow: 0 12px 32px -12px rgba(28, 25, 23, 0.28),
+
+  // --- Componentes -------------------------------------------------------------
+  $btn-font-weight: 600,
+  $btn-padding-x: 1rem,
+  $badge-font-weight: 600,
+  $badge-border-radius: 50rem,
+  $progress-height: 0.5rem,
+  $progress-border-radius: 50rem,
+
+  $card-spacer-y: 1.25rem,
+  $card-spacer-x: 1.25rem,
+  $card-border-radius: var(--cui-border-radius-lg),
+  $card-border-color: var(--cui-border-color),
+  $card-box-shadow: var(--cui-box-shadow-sm),
+  $card-cap-bg: transparent,
+  $card-bg: var(--app-card-bg),
+
+  $dropdown-border-radius: var(--cui-border-radius-lg),
+
+  // Pestañas encerradas (índice, rango de fechas): opción activa en verde.
+  $nav-enclosed-border-radius: 50rem,
+  $nav-enclosed-link-active-bg: var(--cui-primary),
+  $nav-enclosed-link-active-color: var(--app-on-primary),
+  $nav-enclosed-link-active-border-color: var(--cui-primary),
+
+  // --- Sidebar claro con la sección activa en verde --------------------------
+  $sidebar-width: 16.5rem,
+  $sidebar-brand-bg: transparent,
+  $sidebar-nav-padding-x: 0.75rem,
+  $sidebar-nav-gap: 0.125rem,
+  $sidebar-nav-title-margin-top: 0.75rem,
+  $sidebar-nav-title-padding-x: 0.875rem,
+  $sidebar-nav-link-padding-y: 0.6rem,
+  $sidebar-nav-link-padding-x: 0.875rem,
+  $sidebar-nav-link-hover-bg: rgba(var(--cui-primary-rgb), 0.14),
+  $sidebar-nav-link-active-bg: var(--cui-primary),
+  $sidebar-nav-link-active-color: var(--app-on-primary),
+  $sidebar-nav-link-active-icon-color: var(--app-on-primary),
+
+  // --- Header translúcido y footer integrado ---------------------------------
+  $header-bg: rgba(var(--cui-body-bg-rgb), 0.82),
+  $footer-bg: transparent,
+  $footer-border-width: 0
+);
+
+@use "app-tokens";
+@use "themes";
+@use "app-layout";
+@use "auth";
+@use "dashboard";
+@use "settings";
+@use "admin";
+@use "profile";
+@use "agro";
+@use "print";
